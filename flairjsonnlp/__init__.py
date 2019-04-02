@@ -215,4 +215,3 @@ def process(cache, text: str, lang='en', use_ontonotes=False, fast=True, use_emb
     global __cache
     __cache = cache
     return get_nlp_json(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe)
-    #return get_nlp_json((get_flair_sentences(text)))
