@@ -17,7 +17,7 @@ from flair.embeddings import StackedEmbeddings, WordEmbeddings, FlairEmbeddings,
 from flair.models import SequenceTagger, TextClassifier
 from flair.nn import Model
 from nltk import PunktSentenceTokenizer
-import jsonnlp # import base_nlp_json, base_document
+import jsonnlp
 import functools
 
 name = "flairjsonnlp"
@@ -27,7 +27,7 @@ __version__ = "0.0.1"
 sentence_tokenizer = PunktSentenceTokenizer()
 
 def cache_it(func):
-    """A decorator to cache function response based on params. Add it to top of function as @cache_it."""
+    """A decorator to cache function response based on params"""
 
     global __cache
 
@@ -51,7 +51,7 @@ def get_classifier_model(model_name) -> TextClassifier:
 
 
 def get_embeddings(embeddings: List[str], character: bool, bpe: str) -> StackedEmbeddings:
-    """Construct and return a embedding model"""
+    """To Construct and return a embedding model"""
     stack = []
     for e in embeddings:
         if e in ('glove',):
@@ -89,7 +89,7 @@ def get_models(lang: str, use_ontonotes: bool, fast: bool) -> Generator[Model, N
     else:
         yield get_sequence_model('ner-multi-fast' if fast else 'ner-multi')
 
-    # we always would like universal pos tags
+    # For universal pos tags
     yield get_sequence_model('pos-multi-fast' if fast else 'pos-multi')
 
 
@@ -99,7 +99,7 @@ def get_flair_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_em
     if lang not in ('en', 'multi', 'de', 'nl', 'fr'):
         raise TypeError(f'{lang} is not supported! Try multi. See https://github.com/zalandoresearch/flair/blob/master/resources/docs/TUTORIAL_2_TAGGING.md')
 
-    # tokenize sentences and decorate them with all the appropriate model predictions
+    # tokenize sentences
     sentences = [Sentence(t) for t in sentence_tokenizer.sentences_from_text(text)]
     for model in get_models(lang=lang, use_ontonotes=use_ontonotes, fast=fast):
         model.predict(sentences)
@@ -136,12 +136,10 @@ def get_flair_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_em
         d['expressions'] = [{
             'type': span.tag,
             'scores': {'type': span.score},
-            # before tokens are processed, token_id points to the start of this sentence
-            # the Token.idx property starts from 1
             'tokens': [t.idx + token_id - 1 for t in span.tokens]
         } for span in s.get_spans('np') if len(span.tokens) > 1]
 
-        # tokens
+        # features for each token
         for token in s:
             t = {
                 'id': token_id,
@@ -167,7 +165,6 @@ def get_flair_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_em
             entity = token.get_tag('ner')
             if entity.value != 'O':
                 t['entity'] = entity.value
-                # determine the entity value of the previous token in this sentence
                 e = d['tokenList'][-1].get('entity') if token.idx != 1 else None
                 t['entity_iob'] = 'B' if e != entity.value else 'I'
                 t['scores']['entity'] = entity.score
@@ -177,7 +174,6 @@ def get_flair_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_em
             # semantic frames (wordnet)
             frame = token.get_tag('frame')
             if frame.value:
-                # normalize the frame id
                 f = frame.value.split('.')
                 t['synsets'] = [{
                     'wordnetId': '.'.join([f[0], t['upos'][0].lower(), f[1]]),
@@ -185,7 +181,7 @@ def get_flair_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_em
                 }]
 
             # word embeddings
-            if embed_type != 'Flair ':  # some models will add embeddings, but we only want them if requested
+            if embed_type != 'Flair ':
                 t['embeddings'] = [{
                     'model': embed_type,
                     'vector': token.embedding.tolist()
