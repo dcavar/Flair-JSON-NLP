@@ -16,11 +16,14 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'flair>=0.4.1',
-        'pyjsonnlp>=0.2.1'
+        'pyjsonnlp>=0.2.4'
     ],
+    setup_requires=["pytest-runner"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
     ],
+    test_suite="tests",
+    tests_require=["pytest", "coverage"]
 )
