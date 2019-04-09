@@ -7,9 +7,12 @@ Brought to you by the [NLP-Lab.org]!
 
 ## Introduction
 
-[Flair] wrapper for [JSON-NLP].
+This module provides an [Flair] wrapper for [JSON-NLP], which means that the output of [Flair] is returned as [JSON-NLP]. The wrapper also provides the possibility to launch [Flair] as a Microservice with a RESTful interface based on [Flask] or WSGI.
 
 
+## Running flairjsonnlp as a Microservice
+
+Coming soon...
 
 
 
@@ -20,6 +23,7 @@ Brought to you by the [NLP-Lab.org]!
 [Flair]: https://github.com/zalandoresearch/flair "Flair"
 [spaCy]: https://spacy.io/ "spaCy"
 [NLTK]: http://nltk.org/ "Natural Language Processing Toolkit"
-[Polyglot]: https://github.com/aboSamoor/polyglot "Polyglot" 
+[Polyglot]: https://github.com/aboSamoor/polyglot "Polyglot"
 [Xrenner]: https://github.com/amir-zeldes/xrenner "Xrenner"
 [CONLL-U]: https://universaldependencies.org/format.html "CONLL-U"
+[Flask]: http://flask.pocoo.org/ "Flask"
