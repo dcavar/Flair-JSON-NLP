@@ -25,7 +25,7 @@ from pyjsonnlp.pipeline import Pipeline
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 sentence_tokenizer = PunktSentenceTokenizer()
 __cache = defaultdict(dict)
@@ -58,17 +58,17 @@ def get_classifier_model(model_name) -> TextClassifier:
 
 class FlairPipeline(Pipeline):
     @staticmethod
-    def process(text='', lang='en', use_ontonotes=False, fast=True, use_embeddings='', char_embeddings=False, bpe='', coreferences=False, constituents=False, dependencies=False, expressions=False) -> OrderedDict:
+    def process(text='', lang='en', use_ontonotes=False, fast=True, use_embeddings='', char_embeddings=False, bpe='', coreferences=False, constituents=False, dependencies=False, expressions=False, pos=True, sentiment=True) -> OrderedDict:
         if use_embeddings == 'default':
             use_embeddings = 'glove,multi-forward,multi-backward'
         embed_type = f'Flair {use_embeddings}' + (',char' if char_embeddings else '') + (',byte-pair' if bpe else '')
 
-        sentences = FlairPipeline.get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe, expressions)
+        sentences = FlairPipeline.get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe, expressions, pos, sentiment)
 
         return FlairPipeline.get_nlp_json(sentences, text, embed_type)
 
     @staticmethod
-    def get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe, expressions) -> List[Sentence]:
+    def get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe, expressions, pos, sentiment) -> List[Sentence]:
         """Process text using Flair and return the output from Flair"""
 
         if lang not in ('en', 'multi', 'de', 'nl', 'fr'):
@@ -77,7 +77,7 @@ class FlairPipeline(Pipeline):
 
         # tokenize sentences
         sentences = [Sentence(t) for t in sentence_tokenizer.sentences_from_text(text)]
-        for model in get_models(lang=lang, use_ontonotes=use_ontonotes, fast=fast, expressions=expressions):
+        for model in get_models(lang=lang, use_ontonotes=use_ontonotes, fast=fast, expressions=expressions, pos=pos, sentiment=sentiment):
             model.predict(sentences)
 
         # load embedding models
@@ -198,19 +198,23 @@ def get_embeddings(embeddings: List[str], character: bool, bpe: str) -> StackedE
     return StackedEmbeddings(embeddings=stack)
 
 
-def get_models(lang: str, use_ontonotes: bool, fast: bool, expressions: bool) -> Generator[Model, None, None]:
+def get_models(lang: str, use_ontonotes: bool, fast: bool, expressions: bool, pos: bool, sentiment: bool) -> Generator[Model, None, None]:
     """Yield all relevant models"""
     if lang == 'en':
-        yield get_sequence_model('pos-fast' if fast else 'pos')  # xpos
+        if pos:
+            yield get_sequence_model('pos-fast' if fast else 'pos')  # xpos
         yield get_sequence_model(('ner-ontonotes' if use_ontonotes else 'ner') + ('-fast' if fast else ''))
         yield get_sequence_model('frame-fast' if fast else 'frame')
         if expressions:
             yield get_sequence_model('chunk-fast' if fast else 'chunk')
-        yield get_classifier_model('en-sentiment')
+        if sentiment:
+            yield get_classifier_model('en-sentiment')
     elif lang == 'de':
-        yield get_sequence_model('de-pos')  # xpos
+        if pos:
+            yield get_sequence_model('de-pos')  # xpos
         yield get_sequence_model('de-ner-germeval')
-        yield get_classifier_model('de-offensive-language')
+        if sentiment:
+            yield get_classifier_model('de-offensive-language')
     elif lang == 'fr':
         yield get_sequence_model('fr-ner')
     elif lang == 'nl':
