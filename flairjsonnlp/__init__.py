@@ -25,7 +25,7 @@ from pyjsonnlp.pipeline import Pipeline
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 sentence_tokenizer = PunktSentenceTokenizer()
 __cache = defaultdict(dict)
@@ -58,17 +58,20 @@ def get_classifier_model(model_name) -> TextClassifier:
 
 class FlairPipeline(Pipeline):
     @staticmethod
-    def process(text='', lang='en', use_ontonotes=False, fast=True, use_embeddings='', char_embeddings=False, bpe='', coreferences=False, constituents=False, dependencies=False, expressions=False, pos=True, sentiment=True) -> OrderedDict:
+    def process(text='', lang='en', use_ontonotes=False, fast=True, use_embeddings='', char_embeddings=False, bpe_size: int = 0, coreferences=False, constituents=False, dependencies=False, expressions=False, pos=True, sentiment=True) -> OrderedDict:
         if use_embeddings == 'default':
             use_embeddings = 'glove,multi-forward,multi-backward'
-        embed_type = f'Flair {use_embeddings}' + (',char' if char_embeddings else '') + (',byte-pair' if bpe else '')
+        embed_type = f'Flair {use_embeddings}' + (',char' if char_embeddings else '') + (f',byte-pair_{bpe_size}' if bpe_size > 0 else '')
 
-        sentences = FlairPipeline.get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe, expressions, pos, sentiment)
+        if bpe_size not in (0, 50, 100, 200, 300):
+            raise ValueError(f'bpe_size must be one of 0, 50, 100, 200, 300. {bpe_size} is not allowed.')
+
+        sentences = FlairPipeline.get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe_size, expressions, pos, sentiment)
 
         return FlairPipeline.get_nlp_json(sentences, text, embed_type)
 
     @staticmethod
-    def get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe, expressions, pos, sentiment) -> List[Sentence]:
+    def get_sentences(text, lang, use_ontonotes, fast, use_embeddings, char_embeddings, bpe_size, expressions, pos, sentiment) -> List[Sentence]:
         """Process text using Flair and return the output from Flair"""
 
         if lang not in ('en', 'multi', 'de', 'nl', 'fr'):
@@ -81,8 +84,8 @@ class FlairPipeline(Pipeline):
             model.predict(sentences)
 
         # load embedding models
-        if use_embeddings or char_embeddings or bpe:
-            get_embeddings([e.strip() for e in use_embeddings.split(',')], char_embeddings, bpe).embed(sentences)
+        if use_embeddings or char_embeddings or bpe_size > 0:
+            get_embeddings([e.strip() for e in use_embeddings.split(',')], char_embeddings, lang, bpe_size).embed(sentences)
 
         return sentences
 
@@ -149,7 +152,7 @@ class FlairPipeline(Pipeline):
                 entity = token.get_tag('ner')
                 if entity.value != 'O':
                     t['entity'] = entity.value
-                    e = d['tokenList'][-1].get('entity') if token.idx != 1 else None
+                    e = d['tokenList'][token_id-1].get('entity') if token.idx != 1 else None
                     t['entity_iob'] = 'B' if e != entity.value else 'I'
                     t['scores']['entity'] = entity.score
                 else:
@@ -175,25 +178,22 @@ class FlairPipeline(Pipeline):
                 sent['tokens'].append(token_id)
                 token_id += 1
 
-        return pyjsonnlp.remove_empty_fields(d)
+        return pyjsonnlp.remove_empty_fields(j)
 
 
-def get_embeddings(embeddings: List[str], character: bool, bpe: str) -> StackedEmbeddings:
+def get_embeddings(embeddings: List[str], character: bool, lang: str, bpe_size: int) -> StackedEmbeddings:
     """To Construct and return a embedding model"""
     stack = []
     for e in embeddings:
-        if e in ('glove',):
-            stack.append(WordEmbeddings(e))
-        elif e in ('multi-forward', 'multi-backward', 'news-forward', 'news-backward'):
-            stack.append(FlairEmbeddings(e))
-        elif e is not '':
-            raise ModuleNotFoundError(f'{e} embeddings are not currently supported!')
+        if e != '':
+            if 'forward' in e or 'backward' in e:
+                stack.append(FlairEmbeddings(e))
+            else:
+                stack.append(WordEmbeddings(e))
     if character:
         stack.append(CharacterEmbeddings())
-    if bpe:
-        if bpe not in ('en',):
-            raise ModuleNotFoundError(f'{bpe} is not supported for Byte Pair Embeddings')
-        stack.append(BytePairEmbeddings(bpe))
+    if bpe_size > 0:
+        stack.append(BytePairEmbeddings(language=lang, dim=bpe_size))
 
     return StackedEmbeddings(embeddings=stack)
 
