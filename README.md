@@ -64,4 +64,5 @@ Here is an example `GET` call:
 [Polyglot]: https://github.com/aboSamoor/polyglot "Polyglot" 
 [Xrenner]: https://github.com/amir-zeldes/xrenner "Xrenner"
 [CONLL-U]: https://universaldependencies.org/format.html "CONLL-U"
+[Flask]: http://flask.pocoo.org/ "Flask"
 [Flair Docs]: https://github.com/zalandoresearch/flair/tree/master/resources/docs "Flair Docs"
