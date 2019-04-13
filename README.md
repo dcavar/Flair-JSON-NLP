@@ -1,6 +1,6 @@
 # Flair JSON-NLP Wrapper
 
-(C) 2019 by [Damir Cavar], [Oren Baldinger], Maanvitha Gongalla, Anurag Kumar, Murali Kammili
+(C) 2019 by [Damir Cavar], [Oren Baldinger], [Maanvitha Gongalla], Anurag Kumar, Murali Kammili
 
 Brought to you by the [NLP-Lab.org]!
 
@@ -30,7 +30,7 @@ This may take a while depending on your internet connection.
 
 The [JSON-NLP] repository provides a Microservice class, with a pre-built implementation of [Flask]. To run it, execute:
     
-    python spacyjsonnlp/server.py
+    python flairjsonnlp/server.py
  
 Since `server.py` extends the [Flask] app, a WSGI file would contain:
 
@@ -56,6 +56,7 @@ Here is an example `GET` call:
 
 [Damir Cavar]: http://damir.cavar.me/ "Damir Cavar"
 [Oren Baldinger]: https://oren.baldinger.me/ "Oren Baldinger"
+[Maanvitha Gongalla]: https://maanvithag.github.io/MaanvithaGongalla/ "Maanvitha Gongalla"
 [NLP-Lab.org]: http://nlp-lab.org/ "NLP-Lab.org"
 [JSON-NLP]: https://github.com/dcavar/JSON-NLP "JSON-NLP"
 [Flair]: https://github.com/zalandoresearch/flair "Flair"
