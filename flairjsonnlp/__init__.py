@@ -12,22 +12,20 @@ Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
 
 from collections import OrderedDict, defaultdict
 from typing import List, Generator
-from flair.data import Sentence
+from flair.data import Sentence, Token
 from flair.embeddings import StackedEmbeddings, WordEmbeddings, FlairEmbeddings, CharacterEmbeddings, BytePairEmbeddings
 from flair.models import SequenceTagger, TextClassifier
 from flair.nn import Model
 from flair import __version__ as flair_version
-from nltk import PunktSentenceTokenizer
 import pyjsonnlp
 import functools
 
 from pyjsonnlp.pipeline import Pipeline
+from pyjsonnlp.tokenization import segment
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.3"
-
-sentence_tokenizer = PunktSentenceTokenizer()
+__version__ = "0.0.4"
 __cache = defaultdict(dict)
 
 
@@ -79,7 +77,14 @@ class FlairPipeline(Pipeline):
                 f'{lang} is not supported! Try multi. See https://github.com/zalandoresearch/flair/blob/master/resources/docs/TUTORIAL_2_TAGGING.md')
 
         # tokenize sentences
-        sentences = [Sentence(t) for t in sentence_tokenizer.sentences_from_text(text)]
+        sentences = []
+        for s in segment(text):
+            sentence = Sentence()
+            sentences.append(sentence)
+            for t in s:
+                sentence.add_token(Token(t.value, start_position=t.offset, whitespace_after=t.space_after))
+
+        # run models
         for model in get_models(lang=lang, use_ontonotes=use_ontonotes, fast=fast, expressions=expressions, pos=pos, sentiment=sentiment):
             model.predict(sentences)
 
@@ -92,7 +97,7 @@ class FlairPipeline(Pipeline):
     @staticmethod
     def get_nlp_json(sentences: List[Sentence], text: str, embed_type: str) -> OrderedDict:
         j: OrderedDict = pyjsonnlp.get_base()
-        d: OrderedDict = pyjsonnlp.get_base_document('1')
+        d: OrderedDict = pyjsonnlp.get_base_document(1)
         j['documents'][d['id']] = d
 
         d['meta']['DC.source'] = 'Flair {}'.format(flair_version)

@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="flairjsonnlp",
-    version="0.0.3",
+    version="0.0.4",
     author="Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili, Boli Fang",
     author_email="damir@cavar.me",
     description="The Python Flair JSON-NLP package",
@@ -16,7 +16,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'flair>=0.4.1',
-        'pyjsonnlp>=0.2.5'
+        'pyjsonnlp>=0.2.6'
     ],
     setup_requires=["pytest-runner"],
     classifiers=[
