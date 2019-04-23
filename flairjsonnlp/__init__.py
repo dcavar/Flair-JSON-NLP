@@ -25,7 +25,7 @@ from pyjsonnlp.tokenization import segment
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 __cache = defaultdict(dict)
 
 
@@ -167,10 +167,12 @@ class FlairPipeline(Pipeline):
                 frame = token.get_tag('frame')
                 if frame.value:
                     f = frame.value.split('.')
-                    t['synsets'] = [{
-                        'wordnetId': '.'.join([f[0], t['upos'][0].lower(), f[1]]),
-                        'scores': {'wordnetId': frame.score}
-                    }]
+                    w_id = '.'.join([f[0], t['upos'][0].lower(), f[1]])
+                    t['synsets'] = {
+                        w_id: {
+                            'wordnetId': w_id,
+                            'scores': {'wordnetId': frame.score}
+                        }}
 
                 # word embeddings
                 if embed_type != 'Flair ':

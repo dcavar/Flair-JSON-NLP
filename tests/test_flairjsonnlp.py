@@ -12,12 +12,12 @@ text = "Autonomous cars from the countryside of France shift insurance liability
 
 def strip_scores(j):
     """Scores are non-deterministic"""
-    for s in j['documents']['1']['sentences']:
+    for s in j['documents'][1]['sentences']:
         for label in s.get('labels', []):
             label['scores']['label'] = 0
-    for e in j['documents']['1']['expressions']:
+    for e in j['documents'][1]['expressions']:
         e['scores']['type'] = 0
-    for t in j['documents']['1']['tokenList']:
+    for t in j['documents'][1]['tokenList']:
         t['scores']['upos'] = 0
         t['scores']['xpos'] = 0
         t['scores']['entity'] = 0
@@ -65,22 +65,22 @@ class TestFlair(TestCase):
 class TestFlairEmbeddings(TestCase):
     def test_no_embeddings(self):
         actual = FlairPipeline().process(text, lang='multi', fast=True, use_embeddings='', char_embeddings=False, bpe_size=0)
-        assert all(map(lambda t: 'embeddings' not in t, actual['documents']['1']['tokenList'].values())), actual['documents']['1']['tokenList'][1]['embeddings'][0]['model']
+        assert all(map(lambda t: 'embeddings' not in t, actual['documents'][1]['tokenList'].values())), actual['documents'][1]['tokenList'][1]['embeddings'][0]['model']
 
     def test_default_embeddings(self):
         actual = FlairPipeline().process(text, lang='multi', fast=True, use_embeddings='default', char_embeddings=False, bpe_size=0)
         assert all(map(lambda t: t['embeddings'][0]['model'] == 'Flair glove,multi-forward,multi-backward',
-                       actual['documents']['1']['tokenList'].values())), actual['documents']['1']['tokenList'][1]['embeddings'][0]['model']
+                       actual['documents'][1]['tokenList'].values())), actual['documents'][1]['tokenList'][1]['embeddings'][0]['model']
 
     def test_character_embeddings(self):
         actual = FlairPipeline().process(text, lang='multi', fast=True, use_embeddings='', char_embeddings=True, bpe_size=0)
         assert all(map(lambda t: t['embeddings'][0]['model'] == 'Flair ,char',
-                       actual['documents']['1']['tokenList'].values())), actual['documents']['1']['tokenList'][1]['embeddings'][0]['model']
+                       actual['documents'][1]['tokenList'].values())), actual['documents'][1]['tokenList'][1]['embeddings'][0]['model']
 
     def test_bpe(self):
         actual = FlairPipeline().process(text, lang='en', fast=True, use_embeddings='', char_embeddings=False, bpe_size=50)
         assert all(map(lambda t: t['embeddings'][0]['model'] == 'Flair ,byte-pair_50',
-                       actual['documents']['1']['tokenList'].values())), actual['documents']['1']['tokenList'][1]['embeddings'][0]['model']
+                       actual['documents'][1]['tokenList'].values())), actual['documents'][1]['tokenList'][1]['embeddings'][0]['model']
         with pytest.raises(ValueError):
             FlairPipeline().process(text, lang='multi', fast=True, use_embeddings='', char_embeddings=False, bpe_size=50)
         with pytest.raises(ValueError):
