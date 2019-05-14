@@ -138,9 +138,9 @@ class FlairPipeline(Pipeline):
                     'text': token.text,
                     'characterOffsetBegin': token.start_pos,
                     'characterOffsetEnd': token.end_pos,
-                    'features': {'Overt': 'Yes'},
+                    'features': {'Overt': True},
                     'scores': {},
-                    'misc': {'SpaceAfter': 'Yes' if token.whitespace_after else 'No'}
+                    'misc': {'SpaceAfter': True if token.whitespace_after else False}
                 }
 
                 # pos
