@@ -107,7 +107,7 @@ class FlairPipeline(Pipeline):
         token_id = 1
         for i, s in enumerate(sentences):
             sent = {
-                'id': str(i),
+                'id': i,
                 'tokenFrom': token_id,
                 'tokenTo': token_id + len(s),
                 'tokens': []
