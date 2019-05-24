@@ -25,7 +25,7 @@ from pyjsonnlp.tokenization import segment
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __cache = defaultdict(dict)
 
 
@@ -152,12 +152,15 @@ class FlairPipeline(Pipeline):
                 if pos.value:
                     t['xpos'] = pos.value
                     t['scores']['xpos'] = pos.score
-
+                #print(token_id -1, d['tokenList'])
+                
                 # named entities
                 entity = token.get_tag('ner')
                 if entity.value != 'O':
                     t['entity'] = entity.value
-                    e = d['tokenList'][token_id-1].get('entity') if token.idx != 1 else None
+                    #print(token_id, len(d['tokenList']))
+                    e = d['tokenList'][token_id-2].get('entity') if token.idx != 1 else None
+                    #e = None
                     t['entity_iob'] = 'B' if e != entity.value else 'I'
                     t['scores']['entity'] = entity.score
                 else:
@@ -181,7 +184,7 @@ class FlairPipeline(Pipeline):
                         'vector': token.embedding.tolist()
                     }]
 
-                d['tokenList'][t['id']] = t
+                d['tokenList'].append(t)
                 sent['tokens'].append(token_id)
                 token_id += 1
 
@@ -231,3 +234,7 @@ def get_models(lang: str, use_ontonotes: bool, fast: bool, expressions: bool, po
 
     # For universal pos tags
     yield get_sequence_model('pos-multi-fast' if fast else 'pos-multi')
+
+if __name__ == "__main__":
+    test_text = "The Mueller Report is a very long report. We spent a long time analyzing it. Trump wishes we didn't, but that didn't stop the intrepid NlpLab."
+    print(FlairPipeline.process(test_text, coreferences=True, constituents=False))
