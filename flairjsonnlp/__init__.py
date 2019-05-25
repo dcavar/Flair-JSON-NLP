@@ -25,7 +25,7 @@ from pyjsonnlp.tokenization import segment
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.7"
+__version__ = "0.0.8"
 __cache = defaultdict(dict)
 
 
@@ -98,8 +98,9 @@ class FlairPipeline(Pipeline):
     def get_nlp_json(sentences: List[Sentence], text: str, embed_type: str) -> OrderedDict:
         j: OrderedDict = pyjsonnlp.get_base()
         d: OrderedDict = pyjsonnlp.get_base_document(1)
-        j['documents'][d['id']] = d
-
+        #j['documents'][d['id']] = d
+        j['documents'].append(d)
+        
         d['meta']['DC.source'] = 'Flair {}'.format(flair_version)
         d['text'] = text
 
