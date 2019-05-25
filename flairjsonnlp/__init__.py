@@ -25,7 +25,7 @@ from pyjsonnlp.tokenization import segment
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 __cache = defaultdict(dict)
 
 
