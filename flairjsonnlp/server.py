@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+
+"""
+(C) 2019-2020 Damir Cavar
+
+Licensed under the Apache License 2.0, see the file LICENSE for more details.
+
+Brought to you by the NLP-Lab.org (https://nlp-lab.org/)!
+"""
+
 from flairjsonnlp import FlairPipeline
 from pyjsonnlp.microservices.flask_server import FlaskMicroservice
 

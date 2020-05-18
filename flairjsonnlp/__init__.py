@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 """
-(C) 2019 Damir Cavar, Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili, Boli Fang
+(C) 2019-2020 Damir Cavar
+
+Previous contributors from the NLP-Lab: Oren Baldinger, Maanvitha Gongalla, Anurag Kumar, Murali Kammili, Boli Fang
 
 Wrappers for Flair to JSON-NLP output format.
 
@@ -25,7 +27,7 @@ from pyjsonnlp.tokenization import segment
 
 name = "flairjsonnlp"
 
-__version__ = "0.0.8"
+__version__ = "0.0.9"
 __cache = defaultdict(dict)
 
 
@@ -169,7 +171,7 @@ class FlairPipeline(Pipeline):
 
                 # semantic frames (wordnet)
                 frame = token.get_tag('frame')
-                if frame.value:
+                if frame.value and frame.value != '_':
                     f = frame.value.split('.')
                     w_id = '.'.join([f[0], t['upos'][0].lower(), f[1]])
                     t['synsets'] = {

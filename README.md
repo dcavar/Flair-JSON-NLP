@@ -1,14 +1,17 @@
 # Flair JSON-NLP Wrapper
 
-(C) 2019 by [Damir Cavar], [Oren Baldinger], [Maanvitha Gongalla], Anurag Kumar, Murali Kammili
+(C) 2019-2020 by [Damir Cavar]
+
+Contributors to previous versions: [Oren Baldinger], [Maanvitha Gongalla], Anurag Kumar, Murali Kammili
 
 Brought to you by the [NLP-Lab.org]!
 
 
 ## Introduction
 
-[Flair] v4.1 wrapper for [JSON-NLP]. [Flair] provides state-of-the-art embeddings, and tagging capabilities,
+[Flair] v 4.5 wrapper for [JSON-NLP]. [Flair] provides state-of-the-art embeddings, and tagging capabilities,
 in particular, POS-tagging, NER, shallow syntax chunking, and semantic frame detection.
+
 
 ## FlairPipeline
 
@@ -25,6 +28,7 @@ We provide a `FlairPipeline` class, with the following parameters for ease of us
 
 Tagging and Embedding models are downloaded automatically the first time they are called.
 This may take a while depending on your internet connection.
+
 
 ## Microservice
 
